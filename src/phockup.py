@@ -19,6 +19,7 @@ logger = logging.getLogger('phockup')
 
 
 ignored_files = ('.DS_Store', 'Thumbs.db')
+ignored_dir = ('Whatsapp')
 
 
 class Phockup():
@@ -130,24 +131,28 @@ class Phockup():
 
         # Walk the directory
         for root, dirnames, files in os.walk(self.input_dir):
-            files.sort()
-            file_paths_to_process = []
-            for filename in files:
-                if filename in ignored_files:
-                    continue
-                file_paths_to_process.append(os.path.join(root, filename))
-            if self.max_concurrency > 1:
-                if not self.process_files(file_paths_to_process):
-                    return
-            else:
-                try:
-                    for file_path in file_paths_to_process:
-                        self.process_file(file_path)
-                except KeyboardInterrupt:
-                    logger.warning("Received interrupt. Shutting down...")
-                    return
-            if root.count(os.sep) >= self.stop_depth:
-                del dirnames[:]
+            for dir in ignored_dir:
+                if dir in root:
+                    logger.warning(f"Skipping the ignored folder '{dir}'")
+                    continue                    
+                files.sort()
+                file_paths_to_process = []
+                for filename in files:
+                    if filename in ignored_files:
+                        continue
+                    file_paths_to_process.append(os.path.join(root, filename))
+                if self.max_concurrency > 1:
+                    if not self.process_files(file_paths_to_process):
+                        return
+                else:
+                    try:
+                        for file_path in file_paths_to_process:
+                            self.process_file(file_path)
+                    except KeyboardInterrupt:
+                        logger.warning("Received interrupt. Shutting down...")
+                        return
+                if root.count(os.sep) >= self.stop_depth:
+                    del dirnames[:]
 
     def get_file_count(self):
         file_count = 0
@@ -170,7 +175,16 @@ class Phockup():
         patternVideo = re.compile('^(video/.*)$')
         if patternVideo.match(mimetype):
             return 'video'
-        return None
+        
+        patternVideo = re.compile('^(application/.*)$')
+        if patternVideo.match(mimetype):
+            return 'document'
+        
+        patternVideo = re.compile('^(audio/.*)$')
+        if patternVideo.match(mimetype):
+            return 'audio'
+
+        return 'Unknown'
 
     def get_output_dir(self, date):
         """
@@ -332,6 +346,12 @@ but looking for '{self.file_type}'"
             target_file_name = self.get_file_name(filename, date)
             if not self.original_filenames:
                 target_file_name = target_file_name.lower()
+        elif target_file_type in ['document','audio']:
+            path = [self.output_dir, target_file_type]
+            output = os.path.sep.join(path)
+            if not os.path.isdir(output) and not self.dry_run:
+                os.makedirs(output, exist_ok=True)
+            target_file_name = os.path.basename(filename)
         else:
             output = self.get_output_dir([])
             target_file_name = os.path.basename(filename)
