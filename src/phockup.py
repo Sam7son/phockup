@@ -19,7 +19,7 @@ logger = logging.getLogger('phockup')
 
 
 ignored_files = ('.DS_Store', 'Thumbs.db','desktop.ini')
-ignored_dir = ['Whatsapp']
+ignored_dir = ['_ER']
 
 
 class Phockup():

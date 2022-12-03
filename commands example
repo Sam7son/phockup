@@ -1,0 +1,7 @@
+python3 phockup.py /media/pop-os/Samson/Photos/'Moto One Power'/Camera /media/pop-os/Samson/Image_Organized -o -d YYYY -m -t --regex="(?P<day>\d{2})\.(?P<month>\d{2})\.(?P<year>\d{4})[_-]?(?P<hour>\d{2})\.(?P<minute>\d{2})\.(?P<second>\d{2})"
+
+
+python3 phockup.py /media/pop-os/Samson/Photos/'Moto X Play'/Camera /media/pop-os/Samson/Image_Organized -o -d YYYY -m -t --regex="(?P<day>\d{2})\.(?P<month>\d{2})\.(?P<year>\d{4})[_-]?(?P<hour>\d{2})\.(?P<minute>\d{2})\.(?P<second>\d{2})"
+
+
+python3 phockup.py /media/pop-os/Samson/'Whatsapp Images UnReviewed'/ /media/pop-os/Samson/'Whatsapp Images UnReviewed' -o -d YYYY/M_DD -m -t --regex="(?P<day>\d{2})\.(?P<month>\d{2})\.(?P<year>\d{4})[_-]?(?P<hour>\d{2})\.(?P<minute>\d{2})\.(?P<second>\d{2})"
