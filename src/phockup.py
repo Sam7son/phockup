@@ -18,8 +18,8 @@ UNKNOWN = 'unknown'
 logger = logging.getLogger('phockup')
 
 
-ignored_files = ('.DS_Store', 'Thumbs.db')
-ignored_dir = ('Whatsapp')
+ignored_files = ('.DS_Store', 'Thumbs.db','desktop.ini')
+ignored_dir = ['Whatsapp']
 
 
 class Phockup():
@@ -131,9 +131,9 @@ class Phockup():
 
         # Walk the directory
         for root, dirnames, files in os.walk(self.input_dir):
-            for dir in ignored_dir:
-                if dir in root:
-                    logger.warning(f"Skipping the ignored folder '{dir}'")
+            for dir in ignored_dir:                
+                if f"{root}".find(dir)!=-1:
+                    logger.warning(f"Skipping the ignored folder '{dir}' in the path '{root}' ")
                     continue                    
                 files.sort()
                 file_paths_to_process = []
@@ -174,15 +174,31 @@ class Phockup():
 
         patternVideo = re.compile('^(video/.*)$')
         if patternVideo.match(mimetype):
-            return 'video'
+            return 'videos'
         
-        patternVideo = re.compile('^(application/.*)$')
-        if patternVideo.match(mimetype):
-            return 'document'
+        patternexcel = re.compile('^(.*\/([.\w\d-]*excel.*)|(.*spreadsheet.*))$')
+        if patternexcel.match(mimetype):
+            return 'excel_documents'
         
-        patternVideo = re.compile('^(audio/.*)$')
-        if patternVideo.match(mimetype):
-            return 'audio'
+        patternword = re.compile('^(.*\/[.\w\d-]*word.*)$')
+        if patternword.match(mimetype):
+            return 'word_documents'
+        
+        patternpdf = re.compile('^(.*\/[.\w\d-]*pdf.*)$')
+        if patternpdf.match(mimetype):
+            return 'pdf_documents'
+        
+        patternzip = re.compile('^(.*\/[.\w\d-]*zip.*)$')
+        if patternzip.match(mimetype):
+            return 'zip_documents'
+        
+        patterncode = re.compile('^(text\/.*)|(.*json.*)$')
+        if patterncode.match(mimetype):
+            return 'text_code_documents'
+
+        patternaudio = re.compile('^(audio/.*)$')
+        if patternaudio.match(mimetype):
+            return 'audios'
 
         return 'Unknown'
 
@@ -339,14 +355,14 @@ but looking for '{self.file_type}'"
         if exif_data and 'MIMEType' in exif_data:
             target_file_type = self.get_file_type(exif_data['MIMEType'])
 
-        if target_file_type in ['image', 'video']:
+        if target_file_type in ['image']:
             date = Date(filename).from_exif(exif_data, self.timestamp, self.date_regex,
                                             self.date_field)
             output = self.get_output_dir(date)
             target_file_name = self.get_file_name(filename, date)
             if not self.original_filenames:
                 target_file_name = target_file_name.lower()
-        elif target_file_type in ['document','audio']:
+        elif target_file_type in ['videos', 'excel_documents', 'word_documents', 'pdf_documents', 'zip_documents', 'text_code_documents', 'audios']:
             path = [self.output_dir, target_file_type]
             output = os.path.sep.join(path)
             if not os.path.isdir(output) and not self.dry_run:

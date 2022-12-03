@@ -1,0 +1,3 @@
+/media/pop-os/Samson/ImageReOrganized /media/pop-os/Samson/Image_Organized -o -d YYYY -m -t
+
+/media/pop-os/Samson/Image_Organized
