@@ -6,6 +6,7 @@ import os
 import re
 import sys
 
+from src.fileutil import FileUtil
 from src.date import Date
 from src.dependency import check_dependencies
 from src.phockup import Phockup
@@ -37,6 +38,14 @@ def parse_args(args=sys.argv[1:]):
         '--version',
         action='version',
     )
+
+    parser.add_argument(
+        '-ex',
+        '--exclude',
+        action='store',
+        type=FileUtil.parse,
+        help="Use this for excluding some sub folders",
+        )
 
     parser.add_argument(
         '-d',
